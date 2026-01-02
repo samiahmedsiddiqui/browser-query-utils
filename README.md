@@ -9,20 +9,21 @@ Lightweight, safe helpers for getting, setting, and deleting URL query parameter
 
 ## Features
 
-- ✅ Zero runtime dependencies
-- 🌍 Browser-only (no Node.js required in production)
-- 🔄 Get, set, and delete query parameters
-- 🌐 Handles full URLs, relative URLs, and hash fragments
-- 📦 Minified build for production
-- 🧼 Linted and formatted with ESLint + Prettier
+- Zero runtime dependencies
+- Browser-only (no Node.js required in production)
+- Get, set, and delete query parameters
+- Handles full URLs, relative URLs, and hash fragments
+- Minified build for production
+- Linted and formatted with ESLint + Prettier
 
 ---
 
 ## Installation
 
 #### Option 1: Download / Copy
+
 ```html
-<script src="dist/query-utils.min.js"></script>
+<script src="dist/browser-query-utils.min.js"></script>
 ```
 
 ### Option 2: NPM
@@ -42,10 +43,10 @@ npm install browser-query-utils
 #### Specific version:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/browser-query-utils/dist/browser-query-utils.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/browser-query-utils@1.1.0/dist/browser-query-utils.min.js"></script>
 ```
 
-> **Note:** The library attaches itself to window.browserQueryUtils in the browser.
+> **Note:** The library attaches itself to `window.browserQueryUtils` in the browser.
 
 
 ## Usage
