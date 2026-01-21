@@ -1,0 +1,2 @@
+/*! browser-query-utils v2.0.0 | License: MIT */
+!function(e,o){"function"==typeof define&&define.amd?define([],o):"object"==typeof module&&module.exports?module.exports=o():e.browserCookieUtils=o()}("undefined"!=typeof self?self:this,function(){"use strict";return{getCookie:getCookie,setCookie:setCookie,deleteCookie:deleteCookie}});

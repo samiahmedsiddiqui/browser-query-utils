@@ -1,15 +1,23 @@
 {
   "name": "browser-query-utils",
   "description": "Lightweight, safe helpers for getting, setting, and deleting URL query parameters in browsers.",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "type": "module",
-  "main": "dist/browser-query-utils.min.js",
-  "files": [
-    "dist/",
-    "README.md",
-    "CHANGELOG.md",
-    "LICENSE"
-  ],
+	"main": "dist/browser-query-utils.cjs.min.js",
+	"module": "dist/browser-query-utils.min.js",
+	"exports": {
+		".": {
+			"import": "./dist/browser-query-utils.min.js",
+			"require": "./dist/browser-query-utils.cjs.min.js"
+		}
+	},
+	"files": [
+		"dist/",
+		"README.md",
+		"CHANGELOG.md",
+		"LICENSE"
+	],
+	"sideEffects": false,
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

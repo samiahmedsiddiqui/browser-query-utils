@@ -1,32 +1,126 @@
 import { minify } from 'terser';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const pkgPath = path.resolve('./package.json');
-const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const pkg = JSON.parse(
+	fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8')
+);
 const { name, version, license } = pkg;
 
-const inputFile = 'src/browser-query-utils.js';
-const outputFile = 'dist/browser-query-utils.min.js';
-const sourceMapFile = 'dist/browser-query-utils.min.js.map';
+const srcFile = path.join(__dirname, 'src/browser-query-utils.js');
+const distDir = path.join(__dirname, 'dist');
 
-const code = fs.readFileSync(inputFile, 'utf8');
+// Output files
+const esmFile = path.join(distDir, 'browser-query-utils.js');
+const esmMinFile = path.join(distDir, 'browser-query-utils.min.js');
+const cjsFile = path.join(distDir, 'browser-query-utils.cjs.js');
+const cjsMinFile = path.join(distDir, 'browser-query-utils.cjs.min.js');
+const umdFile = path.join(distDir, 'browser-query-utils.umd.js');
+const mapFile = 'browser-query-utils.min.js.map';
+
 const banner = `/*! ${name} v${version} | License: ${license} */`;
 
-(async () => {
-  const result = await minify(code, {
-    compress: true,
-    mangle: true,
-    format: {
-      comments: false,
-      preamble: banner
-    },
-    sourceMap: {
-      filename: outputFile,
-      url: sourceMapFile
-    }
-  });
+function stripExports(code) {
+	return code.replace(
+		/^\s*export\s*\{[^}]*\};?\s*$/gm,
+		''
+	);
+}
 
-  fs.writeFileSync(outputFile, result.code, 'utf8');
-  fs.writeFileSync(sourceMapFile, result.map, 'utf8');
-})();
+async function build() {
+	try {
+		fs.mkdirSync(distDir, { recursive: true });
+
+    const sourceCode = fs.readFileSync(srcFile, 'utf8');
+    const nonEsmCode = stripExports(sourceCode);
+
+		/* ---------------- ESM ---------------- */
+
+		// Non-minified ESM
+		fs.writeFileSync(esmFile, `${banner}\n${sourceCode}`, 'utf8');
+
+		// Minified ESM + source map
+		const esmMin = await minify(sourceCode, {
+			module: true,
+			compress: { passes: 2 },
+			mangle: true,
+			format: {
+				comments: false,
+				preamble: banner
+			},
+			sourceMap: {
+				filename: path.basename(esmMinFile),
+				url: mapFile
+			}
+		});
+
+		fs.writeFileSync(esmMinFile, esmMin.code, 'utf8');
+		fs.writeFileSync(path.join(distDir, mapFile), esmMin.map, 'utf8');
+
+		/* ---------------- CJS ---------------- */
+
+		const cjsWrapped = `
+'use strict';
+${nonEsmCode}
+module.exports = { getCookie, setCookie, deleteCookie };
+`;
+
+		fs.writeFileSync(cjsFile, `${banner}\n${cjsWrapped}`, 'utf8');
+
+		const cjsMin = await minify(cjsWrapped, {
+			compress: { passes: 2 },
+			mangle: true,
+			format: {
+				comments: false,
+				preamble: banner
+			}
+		});
+
+		fs.writeFileSync(cjsMinFile, cjsMin.code, 'utf8');
+
+		/* ---------------- UMD ---------------- */
+
+		const umdWrapped = `
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    define([], factory);
+  } else if (typeof module === 'object' && module.exports) {
+    module.exports = factory();
+  } else {
+    root.browserCookieUtils = factory();
+  }
+}(typeof self !== 'undefined' ? self : this, function () {
+${nonEsmCode}
+return { getCookie, setCookie, deleteCookie };
+}));
+`;
+
+		const umdMinified = await minify(umdWrapped, {
+			compress: { passes: 2 },
+			mangle: true,
+			format: {
+				comments: false,
+				preamble: banner
+			}
+		});
+
+		fs.writeFileSync(umdFile, umdMinified.code, 'utf8');
+
+		console.log('✔ Build complete');
+		console.log(`  - ${path.relative(process.cwd(), esmFile)} (ESM)`);
+		console.log(`  - ${path.relative(process.cwd(), esmMinFile)} (Minified ESM)`);
+		console.log(`  - ${path.relative(process.cwd(), cjsFile)} (CJS)`);
+		console.log(`  - ${path.relative(process.cwd(), cjsMinFile)} (Minified CJS)`);
+		console.log(`  - ${path.relative(process.cwd(), umdFile)} (UMD)`);
+	} catch (err) {
+		console.error('✖ Build failed');
+		console.error(err);
+		process.exit(1);
+	}
+}
+
+build();
