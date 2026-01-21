@@ -2,6 +2,17 @@
 
 All notable changes will be documented in this file.
 
+## [v2.0.1] - Jan 21, 2026
+
+### Fixed
+
+- Corrected CommonJS and UMD build outputs to export the proper query utility functions:
+  - getQueryParams
+  - setQueryParams
+  - deleteQueryParams
+- Fixed an incorrect function name reference introduced in the previous release’s build script.
+- No changes to source code or public API.
+
 ## [v2.0.0] - Jan 21, 2026
 
 ### Added

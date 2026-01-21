@@ -1,7 +1,7 @@
 {
   "name": "browser-query-utils",
   "description": "Lightweight, safe helpers for getting, setting, and deleting URL query parameters in browsers.",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "module",
 	"main": "dist/browser-query-utils.cjs.min.js",
 	"module": "dist/browser-query-utils.min.js",

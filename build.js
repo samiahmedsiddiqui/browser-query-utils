@@ -66,7 +66,7 @@ async function build() {
 		const cjsWrapped = `
 'use strict';
 ${nonEsmCode}
-module.exports = { getCookie, setCookie, deleteCookie };
+module.exports = { getQueryParams, setQueryParams, deleteQueryParams };
 `;
 
 		fs.writeFileSync(cjsFile, `${banner}\n${cjsWrapped}`, 'utf8');
@@ -91,11 +91,11 @@ module.exports = { getCookie, setCookie, deleteCookie };
   } else if (typeof module === 'object' && module.exports) {
     module.exports = factory();
   } else {
-    root.browserCookieUtils = factory();
+    root.browserQueryUtils = factory();
   }
 }(typeof self !== 'undefined' ? self : this, function () {
 ${nonEsmCode}
-return { getCookie, setCookie, deleteCookie };
+return { getQueryParams, setQueryParams, deleteQueryParams };
 }));
 `;
 
